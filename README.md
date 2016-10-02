@@ -2,11 +2,8 @@
 
 [![Build Status](https://travis-ci.org/mikhail-angelov/stub-server.svg?branch=master)](https://travis-ci.org/mikhail-angelov/stub-server)
 
-> Gulp plugin to generate translations json files for angular application from a google spreadsheet
-> **IMPORTANT:** google spreadsheet must have no auth public permissions (e.g.  Anyone with the link can view)
-> and it should be explicitly published using "File > Publish to the web" menu option in the google spreadsheets GUI.
-> as far ar this plugin is based on [node-google-spreadsheet](https://github.com/theoephraim/node-google-spreadsheet)
-> it can be extended to support spreadsheets with authentication
+> This is stub server based on node.js. 
+> It was inspired by [stubby4node](https://github.com/mrak/stubby4node) but it have minimum feature set, which are required to stub simple REST api for varios end 2 end test for UI applications
 
 # Install
 
@@ -19,49 +16,44 @@ npm install stub-server --save-dev
 This code will generate translation json files based on google spreadsheet:
 
 ```javascript
-'use strict';
+const stub= require('stub-server');
+//to start
+var options = {
+	stubs:['<stub file 1>', '<stub file 2>']
+};
+stub.serve(options);
 
-var gulp = require('gulp');
-var translations = require('gulp-translations-from-spreadsheet');
-
-gulp.task('translations', function () {
-  return translations({
-          key: '1cKTLZCglRJkJR_7NGL6vPn1MHdadcLPUOMYjqVKFlB4',
-          sheet: 1,
-          languages: ['en', 'ru'],
-          keyColumn: 'key'
-      })
-    .pipe(gulp.dest('./i18n'));
-});
+//to stop
+stub.stop();
 ```
 
 ### Options
-**NOTE:** all options are mandatory
 
-#### key
-Type: `String`
+#### stubs **mandatory** 
+Type: `Array of Strings`
 
-Google spreadsheet key.  
-*Example: `https://docs.google.com/spreadsheets/d/1cKTLZCglRJkJR_7NGL6vPn1MHdadcLPUOMYjqVKFlB4/edit?usp=sharing`*
+List of json files with http schema, example:
+```
+{
+  "request": {
+    "url": "/api/test",
+    "method": "POST"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "result": "ok"
+    }
+  }
+}
+```
 
-*`1cKTLZCglRJkJR_7NGL6vPn1MHdadcLPUOMYjqVKFlB4 is a key here`*
 
-#### sheet
+#### port **optional**
 Type: `Number`
 
-Worksheet id
-**NOTE:** IDs start at 1
+default port is `8888`
 
-#### languages
-Type: `Array`
-
-List of languages must match with column names in worksheet
-
-#### keyColumn
-Type: `String`
-
-Column name for prompts ids
-
-
-
-**NOTE:** there is [link](https://github.com/marcbuils/gulp-i18n-gspreadsheet) to alternative version of such gulp plugin 
