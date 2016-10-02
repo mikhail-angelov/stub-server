@@ -1,0 +1,23 @@
+{
+  "name": "stub-server",
+  "version": "1.0.0",
+  "description": "it's stub server for nodejs, could be used for subbing http API",
+  "main": "index.js",
+  "scripts": {
+    "test": "mocha ./test/*.spec.js"
+  },
+  "keywords": [
+    "nodejs",
+    "stub",
+    "server"
+  ],
+  "author": "Mikhail Angelov",
+  "license": "MIT",
+  "dependencies": {
+    "httpdispatcher": "^1.0.0"
+  },
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "mocha": "^3.1.0"
+  }
+}
