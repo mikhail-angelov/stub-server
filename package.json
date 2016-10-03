@@ -1,6 +1,6 @@
 {
   "name": "stub-server-node",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "it's stub server for nodejs, could be used for subbing http API",
   "main": "index.js",
   "scripts": {

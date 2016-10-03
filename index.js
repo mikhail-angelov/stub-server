@@ -1,7 +1,8 @@
 const httpDispatcher = require('httpdispatcher');
 const http = require('http');
+const https = require('https');
 const fs = require('fs');
-var server;
+var server, tls_server;
 
 module.exports = {
 	serve: init,
@@ -10,26 +11,47 @@ module.exports = {
 
 
 function init(opts, cb){
-	opts = Object.assign({
-		port: 8888,
-		stubs: []
-	}, opts);
+	try{
+		opts = Object.assign({
+			port: 8888,
+			stubs: []
+		}, opts);
 
-	opts.stubs.forEach(file=>{
-		stub(file, httpDispatcher);
-	})
+		opts.stubs.forEach(file=>{
+			stub(file, httpDispatcher);
+		})
 
-	server = http.createServer((req, res) => {
-        httpDispatcher.dispatch(req, res);
-    }).listen(opts.port, '127.0.0.1',()=>{
-    	console.log('stub server is open:', opts.port)
-    	if(cb) cb(); //for test purpose
-    });
+		server = http.createServer((req, res) => {
+	        httpDispatcher.dispatch(req, res);
+	    }).listen(opts.port, '127.0.0.1',()=>{
+	    	console.log('stub server is open:', opts.port)
+	    	if(cb) cb(); //for test purpose
+	    });
+
+	    if(opts.certs){
+	    	var options = {
+			  key: fs.readFileSync(opts.certs.key),
+			  cert: fs.readFileSync(opts.certs.cert)
+			};
+			const tls_port = opts.tls_port || opts.port - 1
+
+			tls_server = https.createServer(options, function (req, res) {
+			  httpDispatcher.dispatch(req, res);
+			}).listen(tls_port, ()=>{
+	    		console.log('stub https server is open:', tls_port);
+		    });
+	    }
+	}catch(e){
+		console.log('cannot create server', e)
+	}
 }
 
 function stop(){
 	if(server) server.close(()=>{
     	console.log('stub server is closed')
+    });
+	if(tls_server) tls_server.close(()=>{
+    	console.log('stub https server is closed')
     });
 }
 

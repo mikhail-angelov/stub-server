@@ -8,7 +8,7 @@
 # Install
 
 ```
-npm install stub-server --save-dev
+npm install stub-server-node --save-dev
 ```
 
 # Basic Usage
@@ -16,7 +16,7 @@ npm install stub-server --save-dev
 This code will generate translation json files based on google spreadsheet:
 
 ```javascript
-const stub= require('stub-server');
+const stub= require('stub-server-node');
 //to start
 var options = {
 	stubs:['<stub file 1>', '<stub file 2>']
@@ -57,3 +57,17 @@ Type: `Number`
 
 default port is `8888`
 
+#### serts **optional**
+Type: `Object`
+`
+{
+	key: '<path for cert key>',
+	cert: '<path for cert>'
+}
+`
+default serts is null
+
+#### tls_port **optional**
+Type: `Number`
+
+default port is `8887`
