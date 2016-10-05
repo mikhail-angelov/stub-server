@@ -17,9 +17,15 @@ function init(opts, cb){
 			stubs: []
 		}, opts);
 
-		opts.stubs.forEach(file=>{
-			stub(file, httpDispatcher);
-		})
+	    var loadStatus = true;
+	    opts.stubs.forEach(file=> {
+	      loadStatus = loadStatus?stub(file, httpDispatcher):loadStatus;
+	    })
+
+	    if(!loadStatus){
+	      console.log('stub server is failed, cannot load all stub files');
+	      return -1;
+	    }
 
 		server = http.createServer((req, res) => {
 	        httpDispatcher.dispatch(req, res);
@@ -62,23 +68,33 @@ function stub(fileName, dispatcher){
 		const httpStructure = JSON.parse(data);
 		if(httpStructure.request.method === 'POST'){
 			dispatcher.onPost(httpStructure.request.url, function(req, res) {
-				console.log('it\'s POST', JSON.stringify(httpStructure.response.body),
-					httpStructure.response.status || 200)
-		        res.writeHead(httpStructure.response.status || 200, {'Content-Type': 'text/json'});
+				writeCORSHeaders(res, httpStructure.response.status || 200)
 		        res.end(JSON.stringify(httpStructure.response.body));
 		    });
 		    console.log('registered POST on ', httpStructure.request.url)
 		}else if(httpStructure.request.method === 'GET'){
 			dispatcher.onGet(httpStructure.request.url, function(req, res) {
-		        res.writeHead(httpStructure.response.status || 200, {'Content-Type': 'text/json'});
+		        writeCORSHeaders(res, httpStructure.response.status || 200)
 		        res.end(JSON.stringify(httpStructure.response.body));
 		    });
 		    console.log('registered GET on ', httpStructure.request.url)
 		}else{
 			console.log('cannot process http structure', fileName, data)
-		}
-	}catch(e){
-		console.log('cannot process file', fileName, e)
-	}
+	      return false;
+	    }
+	    return true;
+	  } catch (e) {
+	    console.log('cannot process file', fileName, e)
+	    return false;
+	  }
+}
 
+function writeCORSHeaders(res, status){
+	res.writeHead(status, {
+      'Content-Type': 'application/json',
+      'Access-Control-Allow-Origin': '*',
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS, PUT, PATCH, DELETE',
+      'Access-Control-Allow-Headers': 'X-Requested-With,content-type',
+      'Access-Control-Allow-Credentials': true
+    });
 }
